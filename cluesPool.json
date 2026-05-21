@@ -28,6 +28,7 @@
     { "word": "CACHE", "definition": "Hardware or software component that stores data" },
     { "word": "NODE", "definition": "Point in a network or tree" },
     { "word": "GRAPH", "definition": "Diagram representing connections" },
+    { "word": "","definition":"Algorithm a finite sequence of steps"},
     { "word": "HASH", "definition": "Function that maps data to a fixed size" }
   ]
 }
