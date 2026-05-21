@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Figgerits Clone | CS Phrases + External Data</title>
+    <style>
+        /* -------- ORIGINAL APPEARANCE – UNCHANGED -------- */
+        :root {
+            --primary: #4f46e5;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        /* Phrase Section */
+        #main-phrase {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 12px;
+        }
+
+        .word-block {
+            display: flex;
+            gap: 4px;
+        }
+
+        /* Universal Tile Styling */
+        .tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 34px;
+        }
+
+        .tile input {
+            width: 100%;
+            height: 34px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            background: #fff;
+        }
+
+        .tile input:focus {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .tile span {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* Clues Section */
+        .clue-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 20px;
+        }
+
+        .clue-text {
+            flex: 1;
+            font-size: 15px;
+        }
+
+        .clue-text strong {
+            color: var(--primary);
+        }
+
+        .clue-inputs {
+            display: flex;
+            gap: 4px;
+        }
+
+        /* Game status & controls */
+        .game-status {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .win-msg {
+            background: #bbf7d0;
+            color: #166534;
+        }
+
+        .loss-msg {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .action-btn:hover {
+            opacity: 0.85;
+        }
+
+        .action-btn.reset-btn {
+            background: #475569;
+        }
+
+        .action-btn.next-btn {
+            background: #0f766e;
+        }
+
+        #attempt-counter {
+            font-size: 13px;
+            color: #475569;
+            margin-top: 8px;
+        }
+        
+        /* Loading indicator */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Figgerits Logic Puzzle</h1>
+    
+    <div id="main-phrase" class="loading">Loading puzzles...</div>
+    <div id="clues-container"></div>
+
+    <div class="game-status">
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        <div class="action-buttons">
+            <button id="check-btn" class="action-btn" disabled>✓ Check Solution</button>
+            <button id="reset-btn" class="action-btn reset-btn" disabled>⟳ Reset Puzzle</button>
+            <button id="next-btn" class="action-btn next-btn" disabled>⏩ Next Puzzle</button>
+        </div>
+        <div id="attempt-counter">❌ Incorrect checks: 0 / 3</div>
+    </div>
+
+    <div id="win-message" style="display: none;">🎉 Congratulations! You solved the puzzle!</div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // EXTERNAL DATA LOADING
+    // --------------------------------------------------------------
+    let phraseList = [];
+    let cluePool = [];
+    let currentPhraseIndex = 0;
+    let currentPhraseText = "";
+    let currentClues = [];
+    let currentLetterMap = {};
+    
+    // Game state
+    let incorrectAttempts = 0;
+    let gameActive = true;
+    let gameWon = false;
+    let dataLoaded = false;
+    
+    // DOM elements
+    const mainPhraseContainer = document.getElementById('main-phrase');
+    const cluesContainer = document.getElementById('clues-container');
+    const winMessageDiv = document.getElementById('win-message');
+    const statusMsgDiv = document.getElementById('status-message');
+    const attemptCounterSpan = document.getElementById('attempt-counter');
+    const checkBtn = document.getElementById('check-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const nextBtn = document.getElementById('next-btn');
+    
+    // Helper functions (defined early)
+    function getUniqueLetters(phraseText) {
+        return new Set(phraseText.replace(/[^A-Z]/g, ''));
+    }
+    
+    function getAllValidClues(phraseText) {
+        const phraseLetters = getUniqueLetters(phraseText);
+        const valid = [];
+        for (let clue of cluePool) {
+            const wordLetters = clue.word.toUpperCase();
+            let allPresent = true;
+            for (let ch of wordLetters) {
+                if (!phraseLetters.has(ch)) {
+                    allPresent = false;
+                    break;
+                }
+            }
+            if (allPresent) valid.push(clue);
+        }
+        return valid;
+    }
+    
+    function selectCoveringClues(phraseText, maxClues = 6) {
+        const phraseLettersSet = getUniqueLetters(phraseText);
+        const requiredLetters = new Set(phraseLettersSet);
+        const validClues = getAllValidClues(phraseText);
+        
+        if (validClues.length === 0) return [];
+        
+        const sortedClues = [...validClues].sort((a, b) => a.word.length - b.word.length);
+        const selected = [];
+        const covered = new Set();
+        
+        while (covered.size < requiredLetters.size && selected.length < maxClues) {
+            let bestClue = null;
+            let bestNewCoverage = 0;
+            
+            for (let clue of sortedClues) {
+                if (selected.includes(clue)) continue;
+                const clueLetters = new Set(clue.word.toUpperCase().split(''));
+                let newCount = 0;
+                for (let letter of clueLetters) {
+                    if (requiredLetters.has(letter) && !covered.has(letter)) newCount++;
+                }
+                if (newCount > bestNewCoverage) {
+                    bestNewCoverage = newCount;
+                    bestClue = clue;
+                }
+            }
+            
+            if (bestClue === null) break;
+            
+            selected.push(bestClue);
+            const newLetters = new Set(bestClue.word.toUpperCase().split(''));
+            for (let letter of newLetters) {
+                if (requiredLetters.has(letter)) covered.add(letter);
+            }
+        }
+        
+        if (covered.size < requiredLetters.size) {
+            for (let clue of validClues) {
+                const clueLetters = new Set(clue.word.toUpperCase().split(''));
+                let missing = false;
+                for (let letter of requiredLetters) {
+                    if (!covered.has(letter) && clueLetters.has(letter)) {
+                        covered.add(letter);
+                        missing = true;
+                    }
+                }
+                if (missing && !selected.includes(clue)) selected.push(clue);
+                if (covered.size === requiredLetters.size) break;
+            }
+        }
+        
+        return selected;
+    }
+    
+    function buildLetterMap(phraseText) {
+        const uniqueLetters = [...new Set(phraseText.replace(/[^A-Z]/g, ''))];
+        const map = {};
+        uniqueLetters.forEach((letter, idx) => { map[letter] = idx + 1; });
+        return map;
+    }
+    
+    function renderGame() {
+        mainPhraseContainer.innerHTML = '';
+        cluesContainer.innerHTML = '';
+        
+        const words = currentPhraseText.split(' ');
+        words.forEach(word => {
+            const wordBlock = document.createElement('div');
+            wordBlock.className = 'word-block';
+            for (let ch of word) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                if (/[A-Z]/.test(ch)) {
+                    const num = currentLetterMap[ch];
+                    tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${ch}"><span>${num}</span>`;
+                } else {
+                    tile.innerHTML = `<span style="font-size:24px; font-weight:bold; line-height:34px;">${ch}</span>`;
+                }
+                wordBlock.appendChild(tile);
+            }
+            mainPhraseContainer.appendChild(wordBlock);
+        });
+        
+        currentClues.forEach(clue => {
+            const row = document.createElement('div');
+            row.className = 'clue-row';
+            const textDiv = document.createElement('div');
+            textDiv.className = 'clue-text';
+            textDiv.innerHTML = `<strong>Definition:</strong> ${clue.definition}`;
+            const inputsDiv = document.createElement('div');
+            inputsDiv.className = 'clue-inputs';
+            for (let letter of clue.word) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                const num = currentLetterMap[letter];
+                tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
+                inputsDiv.appendChild(tile);
+            }
+            row.appendChild(textDiv);
+            row.appendChild(inputsDiv);
+            cluesContainer.appendChild(row);
+        });
+        
+        attachSyncAndWinDetection();
+    }
+    
+    function resetCurrentPuzzle() {
+        if (!dataLoaded) return;
+        incorrectAttempts = 0;
+        gameActive = true;
+        gameWon = false;
+        winMessageDiv.style.display = 'none';
+        statusMsgDiv.style.display = 'none';
+        updateAttemptDisplay();
+        const allInputs = document.querySelectorAll('input[data-num]');
+        allInputs.forEach(inp => {
+            inp.disabled = false;
+            inp.value = '';
+        });
+        showStatusMessage("Puzzle reset. Good luck!", false);
+        setTimeout(() => {
+            if (statusMsgDiv.textContent.includes("reset")) statusMsgDiv.style.display = 'none';
+        }, 1500);
+    }
+    
+    function loadPuzzle(index) {
+        if (!dataLoaded) return;
+        if (index >= phraseList.length) index = 0;
+        if (index < 0) index = phraseList.length - 1;
+        currentPhraseIndex = index;
+        currentPhraseText = phraseList[currentPhraseIndex].text;
+        currentClues = selectCoveringClues(currentPhraseText, 6);
+        if (currentClues.length === 0) {
+            currentClues = getAllValidClues(currentPhraseText).slice(0, 4);
+        }
+        currentLetterMap = buildLetterMap(currentPhraseText);
+        
+        incorrectAttempts = 0;
+        gameActive = true;
+        gameWon = false;
+        winMessageDiv.style.display = 'none';
+        statusMsgDiv.style.display = 'none';
+        updateAttemptDisplay();
+        attemptCounterSpan.style.color = "#475569";
+        renderGame();
+        showStatusMessage(`New puzzle: "${currentPhraseText}"`, false);
+        setTimeout(() => {
+            if (statusMsgDiv.textContent.includes("New puzzle")) statusMsgDiv.style.display = 'none';
+        }, 2000);
+    }
+    
+    function updateAttemptDisplay() {
+        if (!gameActive || gameWon) return;
+        attemptCounterSpan.textContent = `❌ Incorrect checks: ${incorrectAttempts} / 3`;
+        if (incorrectAttempts >= 3) {
+            attemptCounterSpan.style.color = "#b91c1c";
+        } else {
+            attemptCounterSpan.style.color = "#475569";
+        }
+    }
+    
+    function showStatusMessage(text, isError = false, isWin = false) {
+        statusMsgDiv.style.display = 'block';
+        statusMsgDiv.textContent = text;
+        statusMsgDiv.classList.remove('win-msg', 'loss-msg');
+        if (isWin) {
+            statusMsgDiv.classList.add('win-msg');
+        } else if (isError) {
+            statusMsgDiv.classList.add('loss-msg');
+        } else {
+            statusMsgDiv.classList.add('loss-msg');
+        }
+        if (!isWin && incorrectAttempts < 3 && gameActive) {
+            setTimeout(() => {
+                if (statusMsgDiv.textContent === text) statusMsgDiv.style.display = 'none';
+            }, 2500);
+        }
+    }
+    
+    function getNextEmptyInput(currentInput) {
+        const allInputs = Array.from(document.querySelectorAll('input[data-num]'));
+        const currentIndex = allInputs.indexOf(currentInput);
+        if (currentIndex === -1) return null;
+        for (let i = currentIndex + 1; i < allInputs.length; i++) {
+            const inp = allInputs[i];
+            if (!inp.disabled && inp.value.trim() === '') return inp;
+        }
+        return null;
+    }
+    
+    function moveToNextEmpty(currentInput) {
+        const nextEmpty = getNextEmptyInput(currentInput);
+        if (nextEmpty) nextEmpty.focus();
+    }
+    
+    function handleWin() {
+        if (gameWon) return;
+        gameWon = true;
+        gameActive = false;
+        winMessageDiv.style.display = 'block';
+        showStatusMessage("🎉 PERFECT! You solved the puzzle! 🎉", false, true);
+        const allInputs = document.querySelectorAll('input[data-num]');
+        allInputs.forEach(inp => inp.disabled = true);
+        attemptCounterSpan.textContent = "✨ Puzzle completed! ✨";
+    }
+    
+    function handleLoss() {
+        if (gameWon) return;
+        gameActive = false;
+        gameWon = false;
+        const allInputs = document.querySelectorAll('input[data-num]');
+        allInputs.forEach(inp => inp.disabled = true);
+        showStatusMessage("💀 GAME OVER – You lost! Press 'Reset Puzzle' to try again.", true);
+        attemptCounterSpan.textContent = "❌ Maximum incorrect attempts reached. Game over.";
+        attemptCounterSpan.style.color = "#b91c1c";
+    }
+    
+    function isPuzzleSolved() {
+        const allInputs = document.querySelectorAll('input[data-num]');
+        for (let inp of allInputs) {
+            const expected = inp.getAttribute('data-char');
+            if (inp.value.toUpperCase() !== expected) return false;
+        }
+        return true;
+    }
+    
+    function verifySolution() {
+        if (!gameActive) {
+            if (gameWon) showStatusMessage("You already won! Press Next Puzzle or Reset.", false);
+            else showStatusMessage("Game over! Reset the puzzle to continue.", true);
+            return;
+        }
+        if (isPuzzleSolved()) {
+            handleWin();
+        } else {
+            incorrectAttempts++;
+            updateAttemptDisplay();
+            if (incorrectAttempts >= 3) {
+                handleLoss();
+            } else {
+                const remaining = 3 - incorrectAttempts;
+                showStatusMessage(`❌ Incorrect solution! ${remaining} ${remaining === 1 ? 'attempt' : 'attempts'} left.`, true);
+            }
+        }
+    }
+    
+    function attachSyncAndWinDetection() {
+        const allInputs = document.querySelectorAll('input[data-num]');
+        allInputs.forEach(input => {
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+        });
+        const freshInputs = document.querySelectorAll('input[data-num]');
+        freshInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                if (!gameActive) return;
+                let raw = e.target.value.toUpperCase();
+                let filtered = raw.replace(/[^A-Z]/g, '');
+                if (filtered.length > 1) filtered = filtered.charAt(0);
+                const oldValue = e.target.value;
+                e.target.value = filtered;
+                const num = e.target.getAttribute('data-num');
+                document.querySelectorAll(`input[data-num="${num}"]`).forEach(syncInp => {
+                    if (syncInp !== e.target && syncInp.value !== filtered) {
+                        syncInp.value = filtered;
+                    }
+                });
+                if (filtered !== "" && (oldValue === "" || filtered !== oldValue)) {
+                    moveToNextEmpty(e.target);
+                }
+                if (gameActive && !gameWon && isPuzzleSolved()) {
+                    handleWin();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Space') e.preventDefault();
+            });
+        });
+    }
+    
+    // Enable buttons after data load
+    function enableGame() {
+        checkBtn.disabled = false;
+        resetBtn.disabled = false;
+        nextBtn.disabled = false;
+    }
+    
+    // Load external JSON files
+    async function loadData() {
+        try {
+            const phrasesRes = await fetch('phrases.json');
+            const cluesRes = await fetch('cluesPool.json');
+            
+            if (!phrasesRes.ok || !cluesRes.ok) throw new Error('Failed to load data files');
+            
+            const phrasesData = await phrasesRes.json();
+            const cluesData = await cluesRes.json();
+            
+            phraseList = phrasesData.phrases;
+            cluePool = cluesData.cluePool;
+            
+            if (!phraseList.length || !cluePool.length) throw new Error('Empty data');
+            
+            dataLoaded = true;
+            enableGame();
+            
+            // Start first puzzle
+            currentPhraseText = phraseList[0].text;
+            currentClues = selectCoveringClues(currentPhraseText, 6);
+            if (currentClues.length === 0) {
+                currentClues = getAllValidClues(currentPhraseText).slice(0, 4);
+            }
+            currentLetterMap = buildLetterMap(currentPhraseText);
+            renderGame();
+            updateAttemptDisplay();
+            
+        } catch (error) {
+            console.error(error);
+            mainPhraseContainer.innerHTML = '<div class="loading" style="color:red;">Error loading puzzles. Make sure phrases.json and cluesPool.json are in the same folder.</div>';
+        }
+    }
+    
+    loadData();
+    
+    checkBtn.addEventListener('click', verifySolution);
+    resetBtn.addEventListener('click', resetCurrentPuzzle);
+    nextBtn.addEventListener('click', () => loadPuzzle(currentPhraseIndex + 1));
+</script>
+</body>
+</html>

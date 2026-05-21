@@ -1,0 +1,33 @@
+{
+  "cluePool": [
+    { "word": "LOGIC", "definition": "Reasoning conducted according to strict principles" },
+    { "word": "DATA", "definition": "Facts and statistics collected for reference" },
+    { "word": "CODE", "definition": "System of words, letters, or signs used to represent instructions" },
+    { "word": "ALGO", "definition": "Informal term for a step-by-step procedure" },
+    { "word": "FUN", "definition": "Enjoyment, amusement, or lighthearted pleasure" },
+    { "word": "BINARY", "definition": "Relating to, composed of, or involving two things" },
+    { "word": "SCIENCE", "definition": "Systematic study of the structure of the physical world" },
+    { "word": "SOFT", "definition": "Not hard; easy to mold or cut" },
+    { "word": "WARE", "definition": "Articles offered for sale (part of 'software')" },
+    { "word": "LEARN", "definition": "Gain or acquire knowledge of a skill" },
+    { "word": "MACHINE", "definition": "Apparatus using mechanical power" },
+    { "word": "INTEL", "definition": "Intelligence or information; also a chip brand" },
+    { "word": "ART", "definition": "Expression of creative skill" },
+    { "word": "TREE", "definition": "Hierarchical data structure" },
+    { "word": "STACK", "definition": "Linear data structure (LIFO)" },
+    { "word": "QUEUE", "definition": "Linear data structure (FIFO)" },
+    { "word": "SORT", "definition": "Arrange systematically" },
+    { "word": "LOOP", "definition": "Sequence of instructions repeated" },
+    { "word": "RECURSE", "definition": "To apply a function repeatedly" },
+    { "word": "CLASS", "definition": "Blueprint for objects in OOP" },
+    { "word": "PROGRAM", "definition": "Set of instructions for a computer" },
+    { "word": "COMPUTE", "definition": "Calculate or reckon" },
+    { "word": "ENGINE", "definition": "Machine that converts energy into motion" },
+    { "word": "POWER", "definition": "Ability to do work or act" },
+    { "word": "SMART", "definition": "Intelligent or clever" },
+    { "word": "CACHE", "definition": "Hardware or software component that stores data" },
+    { "word": "NODE", "definition": "Point in a network or tree" },
+    { "word": "GRAPH", "definition": "Diagram representing connections" },
+    { "word": "HASH", "definition": "Function that maps data to a fixed size" }
+  ]
+}
