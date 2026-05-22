@@ -46,7 +46,7 @@ h1 {
 
 .word-block {
     display: flex;
-    gap: 12px;
+    gap: 6px;
 }
 
 /* Universal Tile Styling */
