@@ -351,8 +351,8 @@ async function loadData() {
         dataLoaded = true;
         enableGame();
         
-        currentPhraseText = phraseList[0].text;
-        currentClues = selectCoveringClues(currentPhraseText, 6);
+        currentPhraseText = phraseList[0].text.toUpperCase();
+        currentClues = selectCoveringClues(currentPhraseText, 16);
         if (currentClues.length === 0) {
             currentClues = getAllValidClues(currentPhraseText).slice(0, 4);
         }
