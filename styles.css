@@ -65,7 +65,7 @@ h1 {
     font-weight: bold;
     text-transform: uppercase;
     border: 2px solid var(--border);
-    border-radius: 6px;
+    border-radius: 4px;
     outline: none;
     background: #fff;
 }
