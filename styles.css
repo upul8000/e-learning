@@ -46,7 +46,7 @@ h1 {
 
 .word-block {
     display: flex;
-    gap: 8px;
+    gap: 12px;
 }
 
 /* Universal Tile Styling */
@@ -102,7 +102,7 @@ h1 {
 
 .clue-inputs {
     display: flex;
-    gap: 4px;
+    gap: 8px;
 }
 
 /* Game status & controls */
