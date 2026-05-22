@@ -177,7 +177,7 @@ function loadPuzzle(index) {
     if (index >= phraseList.length) index = 0;
     if (index < 0) index = phraseList.length - 1;
     currentPhraseIndex = index;
-    currentPhraseText = phraseList[currentPhraseIndex].text;
+    currentPhraseText = phraseList[currentPhraseIndex].text.toUpperCase();
     currentClues = selectCoveringClues(currentPhraseText, 6);
     if (currentClues.length === 0) {
         currentClues = getAllValidClues(currentPhraseText).slice(0, 4);
