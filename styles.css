@@ -51,7 +51,7 @@ h1 {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 15px;
+    gap: 20px;  /* Increased gap between word blocks */
     margin-bottom: 40px;
     padding: 20px;
     background-color: #f3f4f6;
@@ -60,15 +60,16 @@ h1 {
     min-height: 100px;
 }
 
-/* Word blocks */
+/* Word blocks - each word is a separate container */
 .word-block {
     display: flex;
     flex-direction: row;
-    gap: 6px;
+    gap: 4px;  /* Small gap between letters in the same word */
     background: #ffffff;
-    padding: 8px 12px;
+    padding: 10px 15px;
     border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
 }
 
 /* Tiles */
@@ -76,14 +77,15 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 48px;
+    width: 52px;  /* Slightly wider for better spacing */
+    margin: 0 2px;  /* Add small margin between tiles */
 }
 
 .tile-input {
     width: 100%;
-    height: 48px;
+    height: 52px;
     text-align: center;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
     border: 2px solid var(--border);
@@ -91,6 +93,7 @@ h1 {
     outline: none;
     background: white;
     font-family: monospace;
+    transition: all 0.2s;
 }
 
 .tile-input:focus {
@@ -111,6 +114,17 @@ h1 {
     font-weight: 500;
 }
 
+/* Punctuation and spaces styling */
+.tile span[style*="font-size:24px"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    font-size: 24px !important;
+    font-weight: bold;
+    color: var(--primary);
+}
+
 /* Clues container */
 #clues-container {
     display: flex;
@@ -123,8 +137,8 @@ h1 {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 12px;
+    gap: 15px;
+    padding: 15px;
     background: #f9fafb;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -137,7 +151,7 @@ h1 {
     font-size: 15px;
     font-weight: 600;
     color: var(--primary);
-    min-width: 150px;
+    min-width: 180px;
 }
 
 .clue-inputs {
@@ -269,15 +283,15 @@ h1 {
 /* Responsive design */
 @media (max-width: 640px) {
     .container {
-        padding: 20px;
+        padding: 15px;
     }
     
     .tile {
-        width: 38px;
+        width: 42px;
     }
     
     .tile-input {
-        height: 38px;
+        height: 42px;
         font-size: 18px;
     }
     
@@ -286,12 +300,37 @@ h1 {
     }
     
     .word-block {
-        padding: 5px 8px;
+        padding: 8px 12px;
     }
     
     .action-btn {
         padding: 10px 18px;
         font-size: 14px;
+    }
+    
+    .tile span {
+        font-size: 10px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .tile {
+        width: 36px;
+    }
+    
+    .tile-input {
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .clue-inputs .tile {
+        width: 36px;
+    }
+    
+    .word-block {
+        gap: 2px;
+        padding: 6px 10px;
     }
 }
 
