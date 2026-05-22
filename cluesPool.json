@@ -99,9 +99,9 @@
     { "word": "URL","definition":"Uniform Resource Locator"},
     { "word": "UPS","definition":"Uninterruptible Power Supply"},
     { "word": "USB","definition":"Universal Serial Bus"},
-    { "word": "CPU","definition":""},
-    { "word": "CPU","definition":""},
-    { "word": "CPU","definition":""},
+    { "word": "XML","definition":"eXtensible Markup Language"},
+    { "word": "SQL","definition":"Structured Query Language"},
+    { "word": "ZIP","definition":"a popular archive file format"},
     { "word": "HASH", "definition": "Function that maps data to a fixed size" }
   ]
 }
