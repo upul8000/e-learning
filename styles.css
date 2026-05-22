@@ -1,7 +1,63 @@
-/* Add these new styles to your existing CSS */
+:root {
+    --primary: #4f46e5;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --border: #e2e8f0;
+}
 
-/* Style for tile inputs */
-.tile-input {
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary);
+    margin-top: 0;
+}
+
+/* Phrase Section */
+#main-phrase {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: #f1f5f9;
+    border-radius: 12px;
+}
+
+.word-block {
+    display: flex;
+    gap: 4px;
+}
+
+/* Universal Tile Styling */
+.tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 34px;
+}
+
+.tile input {
     width: 100%;
     height: 34px;
     text-align: center;
@@ -12,84 +68,110 @@
     border-radius: 6px;
     outline: none;
     background: #fff;
-    font-family: monospace;
 }
 
-.tile-input:focus {
+.tile input:focus {
     border-color: var(--primary);
     background: #eef2ff;
 }
 
-/* Punctuation styling */
-.punctuation {
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 34px;
-    color: var(--primary);
+.tile span {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
 }
 
-/* Solved state styles - when puzzle is won */
-.solved-word {
-    background: #f0fdf4;
-    padding: 8px 15px;
-    border-radius: 10px;
-    border: 1px solid #bbf7d0;
-}
-
-.solved-word-text {
-    font-size: 24px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: #166534;
-    font-family: monospace;
-}
-
-.solved-clue-row {
-    background: #f0fdf4;
-    padding: 12px 15px;
-    border-radius: 8px;
-    border-left: 4px solid #22c55e;
-}
-
-.solved-answer {
-    font-size: 16px;
-    color: #166534;
-    font-weight: 600;
-    background: #dcfce7;
-    padding: 5px 12px;
-    border-radius: 20px;
-    min-width: 120px;
-    text-align: center;
-}
-
-.solved-answer strong {
-    color: #059669;
-}
-
-/* Ensure clue rows are properly styled in solved state */
-.clue-row.solved-clue-row {
+/* Clues Section */
+.clue-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
     gap: 20px;
 }
 
-/* Animation for win transition */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.clue-text {
+    flex: 1;
+    font-size: 15px;
 }
 
-.solved-word, .solved-clue-row {
-    animation: fadeIn 0.5s ease-out;
+.clue-text strong {
+    color: var(--primary);
+}
+
+.clue-inputs {
+    display: flex;
+    gap: 4px;
+}
+
+/* Game status & controls */
+.game-status {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.status-message {
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.win-msg {
+    background: #bbf7d0;
+    color: #166534;
+}
+
+.loss-msg {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    background: var(--primary);
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.action-btn:hover {
+    opacity: 0.85;
+}
+
+.action-btn.reset-btn {
+    background: #475569;
+}
+
+.action-btn.next-btn {
+    background: #0f766e;
+}
+
+#attempt-counter {
+    font-size: 13px;
+    color: #475569;
+    margin-top: 8px;
+}
+
+/* Loading indicator */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--primary);
+    font-weight: bold;
 }
