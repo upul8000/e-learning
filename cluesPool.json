@@ -48,7 +48,7 @@
     { "word": "CRASH","definition":"A hardware or software issue that leads to data loss or computer failure"},
     { "word": "CURSOR","definition":"A moving position-indicator displayed on a computer monitor"},
     { "word": "DATABASE","definition":"A collection of similar information stored in a file"},
-    { "word": "DESKTOP","The main directory of the user interface":""},
+    { "word": "DESKTOP","definition":"The main directory of the user interface"},
     { "word": "DIRECTORY","definition":"A repository where all files are kept on computer"},
     { "word": "DOMAIN","definition":"Represents an IP (Internet Protocol) address"},
     { "word": "DOWNLOAD","definition":"Saving a file or info from the internet onto your device"},
