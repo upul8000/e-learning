@@ -46,7 +46,7 @@ function getAllValidClues(phraseText) {
     return valid;
 }
 
-function selectCoveringClues(phraseText, maxClues = 6) {
+function selectCoveringClues(phraseText, maxClues = 16) {
     const phraseLettersSet = getUniqueLetters(phraseText);
     const requiredLetters = new Set(phraseLettersSet);
     const validClues = getAllValidClues(phraseText);
