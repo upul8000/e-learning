@@ -108,6 +108,48 @@ function buildLetterMap(phraseText) {
     return map;
 }
 
+// NEW FUNCTION: Display solved phrase as normal text
+function displaySolvedPhrase() {
+    mainPhraseContainer.innerHTML = '';
+    
+    const words = currentPhraseText.split(' ');
+    words.forEach(word => {
+        const wordBlock = document.createElement('div');
+        wordBlock.className = 'word-block solved-word';
+        
+        // Create a span for the entire word
+        const wordSpan = document.createElement('span');
+        wordSpan.className = 'solved-word-text';
+        wordSpan.textContent = word;
+        wordBlock.appendChild(wordSpan);
+        
+        mainPhraseContainer.appendChild(wordBlock);
+    });
+}
+
+// NEW FUNCTION: Display solved clues as normal text
+function displaySolvedClues() {
+    cluesContainer.innerHTML = '';
+    
+    currentClues.forEach(clue => {
+        const row = document.createElement('div');
+        row.className = 'clue-row solved-clue-row';
+        
+        const textDiv = document.createElement('div');
+        textDiv.className = 'clue-text';
+        textDiv.innerHTML = `<strong>Definition:</strong> ${clue.definition}`;
+        
+        const answerDiv = document.createElement('div');
+        answerDiv.className = 'solved-answer';
+        answerDiv.innerHTML = `<strong>Answer:</strong> ${clue.word.toUpperCase()}`;
+        
+        row.appendChild(textDiv);
+        row.appendChild(answerDiv);
+        cluesContainer.appendChild(row);
+    });
+}
+
+// Modified renderGame function
 function renderGame() {
     mainPhraseContainer.innerHTML = '';
     cluesContainer.innerHTML = '';
@@ -121,9 +163,9 @@ function renderGame() {
             tile.className = 'tile';
             if (/[A-Z]/.test(ch)) {
                 const num = currentLetterMap[ch];
-                tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${ch}"><span>${num}</span>`;
+                tile.innerHTML = `<input type="text" maxlength="1" class="tile-input" data-num="${num}" data-char="${ch}"><span>${num}</span>`;
             } else {
-                tile.innerHTML = `<span style="font-size:24px; font-weight:bold; line-height:34px;">${ch}</span>`;
+                tile.innerHTML = `<span class="punctuation">${ch}</span>`;
             }
             wordBlock.appendChild(tile);
         }
@@ -142,7 +184,7 @@ function renderGame() {
             const tile = document.createElement('div');
             tile.className = 'tile';
             const num = currentLetterMap[letter];
-            tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
+            tile.innerHTML = `<input type="text" maxlength="1" class="tile-input" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
             inputsDiv.appendChild(tile);
         }
         row.appendChild(textDiv);
@@ -161,11 +203,10 @@ function resetCurrentPuzzle() {
     winMessageDiv.style.display = 'none';
     statusMsgDiv.style.display = 'none';
     updateAttemptDisplay();
-    const allInputs = document.querySelectorAll('input[data-num]');
-    allInputs.forEach(inp => {
-        inp.disabled = false;
-        inp.value = '';
-    });
+    
+    // Re-render with tiles
+    renderGame();
+    
     showStatusMessage("Puzzle reset. Good luck!", false);
     setTimeout(() => {
         if (statusMsgDiv.textContent.includes("reset")) statusMsgDiv.style.display = 'none';
@@ -216,8 +257,6 @@ function showStatusMessage(text, isError = false, isWin = false) {
         statusMsgDiv.classList.add('win-msg');
     } else if (isError) {
         statusMsgDiv.classList.add('loss-msg');
-    } else {
-        statusMsgDiv.classList.add('loss-msg');
     }
     if (!isWin && incorrectAttempts < 3 && gameActive) {
         setTimeout(() => {
@@ -227,7 +266,7 @@ function showStatusMessage(text, isError = false, isWin = false) {
 }
 
 function getNextEmptyInput(currentInput) {
-    const allInputs = Array.from(document.querySelectorAll('input[data-num]'));
+    const allInputs = Array.from(document.querySelectorAll('.tile-input'));
     const currentIndex = allInputs.indexOf(currentInput);
     if (currentIndex === -1) return null;
     for (let i = currentIndex + 1; i < allInputs.length; i++) {
@@ -242,14 +281,18 @@ function moveToNextEmpty(currentInput) {
     if (nextEmpty) nextEmpty.focus();
 }
 
+// MODIFIED handleWin function
 function handleWin() {
     if (gameWon) return;
     gameWon = true;
     gameActive = false;
     winMessageDiv.style.display = 'block';
     showStatusMessage("🎉 PERFECT! You solved the puzzle! 🎉", false, true);
-    const allInputs = document.querySelectorAll('input[data-num]');
-    allInputs.forEach(inp => inp.disabled = true);
+    
+    // Display solved phrase and clues as normal text
+    displaySolvedPhrase();
+    displaySolvedClues();
+    
     attemptCounterSpan.textContent = "✨ Puzzle completed! ✨";
 }
 
@@ -257,7 +300,7 @@ function handleLoss() {
     if (gameWon) return;
     gameActive = false;
     gameWon = false;
-    const allInputs = document.querySelectorAll('input[data-num]');
+    const allInputs = document.querySelectorAll('.tile-input');
     allInputs.forEach(inp => inp.disabled = true);
     showStatusMessage("💀 GAME OVER – You lost! Press 'Reset Puzzle' to try again.", true);
     attemptCounterSpan.textContent = "❌ Maximum incorrect attempts reached. Game over.";
@@ -265,7 +308,7 @@ function handleLoss() {
 }
 
 function isPuzzleSolved() {
-    const allInputs = document.querySelectorAll('input[data-num]');
+    const allInputs = document.querySelectorAll('.tile-input');
     for (let inp of allInputs) {
         const expected = inp.getAttribute('data-char');
         if (inp.value.toUpperCase() !== expected) return false;
@@ -294,12 +337,12 @@ function verifySolution() {
 }
 
 function attachSyncAndWinDetection() {
-    const allInputs = document.querySelectorAll('input[data-num]');
+    const allInputs = document.querySelectorAll('.tile-input');
     allInputs.forEach(input => {
         const newInput = input.cloneNode(true);
         input.parentNode.replaceChild(newInput, input);
     });
-    const freshInputs = document.querySelectorAll('input[data-num]');
+    const freshInputs = document.querySelectorAll('.tile-input');
     freshInputs.forEach(input => {
         input.addEventListener('input', (e) => {
             if (!gameActive) return;
@@ -309,7 +352,7 @@ function attachSyncAndWinDetection() {
             const oldValue = e.target.value;
             e.target.value = filtered;
             const num = e.target.getAttribute('data-num');
-            document.querySelectorAll(`input[data-num="${num}"]`).forEach(syncInp => {
+            document.querySelectorAll(`.tile-input[data-num="${num}"]`).forEach(syncInp => {
                 if (syncInp !== e.target && syncInp.value !== filtered) {
                     syncInp.value = filtered;
                 }
