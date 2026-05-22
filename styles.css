@@ -36,42 +36,47 @@ h1 {
     color: var(--primary);
 }
 
-.subtitle {
+/* Loading state */
+.loading {
     text-align: center;
+    padding: 40px;
     color: #6b7280;
-    margin-bottom: 25px;
-    font-size: 14px;
+    font-size: 16px;
 }
 
-/* Phrase Section - HORIZONTAL ARRANGEMENT */
-.phrase-container {
+/* Main phrase container */
+#main-phrase {
     display: flex;
-    flex-direction: row;           /* Changed to horizontal */
+    flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center;           /* Align items vertically centered */
+    align-items: center;
     gap: 15px;
     margin-bottom: 40px;
     padding: 20px;
     background-color: #f3f4f6;
     border-radius: 8px;
-    overflow-x: auto;              /* Allow horizontal scrolling on small screens */
+    overflow-x: auto;
+    min-height: 100px;
 }
 
-.word {
+/* Word blocks */
+.word-block {
     display: flex;
-    flex-direction: row;           /* Letters in each word are horizontal */
+    flex-direction: row;
     gap: 6px;
-    background: #e5e7eb;
+    background: #ffffff;
     padding: 8px 12px;
     border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+/* Tiles */
 .tile {
     display: flex;
-    flex-direction: column;        /* Keep number below letter */
+    flex-direction: column;
     align-items: center;
-    width: 48px;                   /* Slightly wider for better spacing */
+    width: 48px;
 }
 
 .tile-input {
@@ -93,22 +98,21 @@ h1 {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
-/* Non-interactive phrase viewports */
-.phrase-container .tile-input {
-    pointer-events: none;
-    background-color: #f9fafb;
-    font-weight: 600;
+.tile-input:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
 }
 
-.tile-number {
+.tile span {
     font-size: 11px;
     color: #6b7280;
     margin-top: 4px;
     font-weight: 500;
 }
 
-/* Clues Section - HORIZONTAL ARRANGEMENT */
-.clues-container {
+/* Clues container */
+#clues-container {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -117,7 +121,7 @@ h1 {
 
 .clue-row {
     display: flex;
-    flex-direction: row;           /* Keep row layout */
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 10px;
     padding: 12px;
@@ -128,13 +132,6 @@ h1 {
     align-items: center;
 }
 
-@media (min-width: 600px) {
-    .clue-row {
-        flex-direction: row;
-        align-items: center;
-    }
-}
-
 .clue-text {
     flex: 1;
     font-size: 15px;
@@ -143,39 +140,54 @@ h1 {
     min-width: 150px;
 }
 
-.clue-slots {
+.clue-inputs {
     display: flex;
-    flex-direction: row;           /* Horizontal arrangement of letter tiles */
+    flex-direction: row;
     gap: 8px;
     flex-wrap: wrap;
     align-items: center;
 }
 
-.clue-slots .tile {
+.clue-inputs .tile {
     width: 52px;
-    display: flex;
-    flex-direction: column;        /* Number stays below letter */
-    align-items: center;
 }
 
-.clue-slots .tile-input {
-    height: 44px;
-    font-size: 20px;
-    background: white;
-    pointer-events: auto;
-    cursor: pointer;
-}
-
-/* Actions */
-.actions {
+/* Game status section */
+.game-status {
     margin-top: 30px;
+}
+
+.status-message {
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.win-msg {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #34d399;
+}
+
+.loss-msg {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #f87171;
+}
+
+/* Action buttons */
+.action-buttons {
     display: flex;
     justify-content: center;
     gap: 15px;
     flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
-button {
+.action-btn {
     padding: 12px 24px;
     font-size: 16px;
     font-weight: 600;
@@ -185,104 +197,129 @@ button {
     transition: all 0.2s;
 }
 
-.btn-primary {
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.action-btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+#check-btn {
     background-color: var(--primary);
     color: white;
 }
 
-.btn-primary:hover {
+#check-btn:hover:not(:disabled) {
     background-color: var(--primary-hover);
     transform: translateY(-1px);
 }
 
-.btn-secondary {
+#reset-btn {
     background-color: #6b7280;
     color: white;
 }
 
-.btn-secondary:hover {
+#reset-btn:hover:not(:disabled) {
     background-color: #4b5563;
+    transform: translateY(-1px);
 }
 
-.btn-success {
+#next-btn {
     background-color: var(--success);
     color: white;
 }
 
-.btn-success:hover {
+#next-btn:hover:not(:disabled) {
     background-color: #059669;
+    transform: translateY(-1px);
 }
 
-.message {
+/* Attempt counter */
+#attempt-counter {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Win message */
+#win-message {
     text-align: center;
     margin-top: 20px;
-    padding: 12px;
+    padding: 15px;
+    background-color: #d1fae5;
+    color: #065f46;
     border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    min-height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    animation: celebrate 0.5s ease-in-out 3;
 }
 
-.success-text {
-    color: var(--success);
+@keyframes celebrate {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
-.error-text {
-    color: var(--error);
-}
-
-.warning-text {
-    color: var(--warning);
-}
-
-.progress-bar {
-    margin-top: 15px;
-    background: #e5e7eb;
-    border-radius: 10px;
-    height: 8px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    background: var(--success);
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s;
-    border-radius: 10px;
-}
-
-.stats {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-/* Responsive adjustments for small screens */
+/* Responsive design */
 @media (max-width: 640px) {
+    .container {
+        padding: 20px;
+    }
+    
     .tile {
         width: 38px;
     }
+    
     .tile-input {
         height: 38px;
         font-size: 18px;
     }
-    .clue-slots .tile {
+    
+    .clue-inputs .tile {
         width: 42px;
     }
-    .container {
-        padding: 20px;
-    }
-    .word {
+    
+    .word-block {
         padding: 5px 8px;
+    }
+    
+    .action-btn {
+        padding: 10px 18px;
+        font-size: 14px;
     }
 }
 
-/* Optional: Add a nice container for each word to stand out */
-.word {
-    background: #ffffff;
-    padding: 8px 12px;
-    border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+/* Error state */
+.error-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--error);
+    background-color: #fee2e2;
+    border-radius: 8px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
 }
