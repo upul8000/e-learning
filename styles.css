@@ -1,18 +1,14 @@
 :root {
     --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --bg: #f9fafb;
+    --background: #f8fafc;
     --card-bg: #ffffff;
-    --text: #1f2937;
-    --border: #e5e7eb;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
+    --text: #1e293b;
+    --border: #e2e8f0;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg);
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: var(--background);
     color: var(--text);
     margin: 0;
     padding: 20px;
@@ -22,343 +18,160 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 800px;
     width: 100%;
     background: var(--card-bg);
     padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 h1 {
     text-align: center;
-    margin-top: 0;
     color: var(--primary);
+    margin-top: 0;
 }
 
-/* Loading state */
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #6b7280;
-    font-size: 16px;
-}
-
-/* Main phrase container */
+/* Phrase Section */
 #main-phrase {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
+    gap: 15px;
     justify-content: center;
-    align-items: center;
-    gap: 20px;  /* Increased gap between word blocks */
     margin-bottom: 40px;
     padding: 20px;
-    background-color: #f3f4f6;
-    border-radius: 8px;
-    overflow-x: auto;
-    min-height: 100px;
+    background: #f1f5f9;
+    border-radius: 12px;
 }
 
-/* Word blocks - each word is a separate container */
 .word-block {
     display: flex;
-    flex-direction: row;
-    gap: 4px;  /* Small gap between letters in the same word */
-    background: #ffffff;
-    padding: 10px 15px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--border);
+    gap: 4px;
 }
 
-/* Tiles */
+/* Universal Tile Styling */
 .tile {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 52px;  /* Slightly wider for better spacing */
-    margin: 0 2px;  /* Add small margin between tiles */
+    width: 34px;
 }
 
-.tile-input {
+.tile input {
     width: 100%;
-    height: 52px;
+    height: 34px;
     text-align: center;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     text-transform: uppercase;
     border: 2px solid var(--border);
-    border-radius: 8px;
+    border-radius: 6px;
     outline: none;
-    background: white;
-    font-family: monospace;
-    transition: all 0.2s;
+    background: #fff;
 }
 
-.tile-input:focus {
+.tile input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-}
-
-.tile-input:disabled {
-    background-color: #f3f4f6;
-    color: #9ca3af;
-    cursor: not-allowed;
+    background: #eef2ff;
 }
 
 .tile span {
     font-size: 11px;
-    color: #6b7280;
-    margin-top: 4px;
-    font-weight: 500;
+    color: #64748b;
+    margin-top: 2px;
 }
 
-/* Punctuation and spaces styling */
-.tile span[style*="font-size:24px"] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 52px;
-    font-size: 24px !important;
-    font-weight: bold;
-    color: var(--primary);
-}
-
-/* Clues container */
-#clues-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
+/* Clues Section */
 .clue-row {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 15px;
-    background: #f9fafb;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    transition: all 0.2s;
     align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 20px;
 }
 
 .clue-text {
     flex: 1;
     font-size: 15px;
-    font-weight: 600;
+}
+
+.clue-text strong {
     color: var(--primary);
-    min-width: 180px;
 }
 
 .clue-inputs {
     display: flex;
-    flex-direction: row;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
+    gap: 4px;
 }
 
-.clue-inputs .tile {
-    width: 52px;
-}
-
-/* Game status section */
+/* Game status & controls */
 .game-status {
-    margin-top: 30px;
+    margin-top: 20px;
+    text-align: center;
 }
 
 .status-message {
-    text-align: center;
     padding: 12px;
     border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    margin-bottom: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 12px;
 }
 
 .win-msg {
-    background-color: #d1fae5;
-    color: #065f46;
-    border: 1px solid #34d399;
+    background: #bbf7d0;
+    color: #166534;
 }
 
 .loss-msg {
-    background-color: #fee2e2;
+    background: #fee2e2;
     color: #991b1b;
-    border: 1px solid #f87171;
 }
 
-/* Action buttons */
 .action-buttons {
     display: flex;
+    gap: 12px;
     justify-content: center;
-    gap: 15px;
+    margin-top: 8px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
 }
 
 .action-btn {
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: 600;
+    background: var(--primary);
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.action-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.action-btn:active:not(:disabled) {
-    transform: translateY(1px);
-}
-
-#check-btn {
-    background-color: var(--primary);
     color: white;
-}
-
-#check-btn:hover:not(:disabled) {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-}
-
-#reset-btn {
-    background-color: #6b7280;
-    color: white;
-}
-
-#reset-btn:hover:not(:disabled) {
-    background-color: #4b5563;
-    transform: translateY(-1px);
-}
-
-#next-btn {
-    background-color: var(--success);
-    color: white;
-}
-
-#next-btn:hover:not(:disabled) {
-    background-color: #059669;
-    transform: translateY(-1px);
-}
-
-/* Attempt counter */
-#attempt-counter {
-    text-align: center;
-    font-size: 14px;
     font-weight: 500;
-    padding: 10px;
-    background-color: #f9fafb;
-    border-radius: 8px;
-    margin-top: 10px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-/* Win message */
-#win-message {
-    text-align: center;
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #d1fae5;
-    color: #065f46;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: bold;
-    animation: celebrate 0.5s ease-in-out 3;
+.action-btn:hover {
+    opacity: 0.85;
 }
 
-@keyframes celebrate {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+.action-btn.reset-btn {
+    background: #475569;
 }
 
-/* Responsive design */
-@media (max-width: 640px) {
-    .container {
-        padding: 15px;
-    }
-    
-    .tile {
-        width: 42px;
-    }
-    
-    .tile-input {
-        height: 42px;
-        font-size: 18px;
-    }
-    
-    .clue-inputs .tile {
-        width: 42px;
-    }
-    
-    .word-block {
-        padding: 8px 12px;
-    }
-    
-    .action-btn {
-        padding: 10px 18px;
-        font-size: 14px;
-    }
-    
-    .tile span {
-        font-size: 10px;
-    }
+.action-btn.next-btn {
+    background: #0f766e;
 }
 
-/* Extra small screens */
-@media (max-width: 480px) {
-    .tile {
-        width: 36px;
-    }
-    
-    .tile-input {
-        height: 36px;
-        font-size: 16px;
-    }
-    
-    .clue-inputs .tile {
-        width: 36px;
-    }
-    
-    .word-block {
-        gap: 2px;
-        padding: 6px 10px;
-    }
+#attempt-counter {
+    font-size: 13px;
+    color: #475569;
+    margin-top: 8px;
 }
 
-/* Error state */
-.error-state {
+/* Loading indicator */
+.loading {
     text-align: center;
     padding: 40px;
-    color: var(--error);
-    background-color: #fee2e2;
-    border-radius: 8px;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--border);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover);
+    color: var(--primary);
+    font-weight: bold;
 }
