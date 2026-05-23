@@ -1,11 +1,11 @@
 {
   "cluePool": [
-    { "word": "LOGIC", "definition": "Reasoning conducted according to strict principles" },
-    { "word": "DATA", "definition": "The basic entity or fact that is used in calculation or manipulation process" },
+    { "word": "LOGIC", "definition": "The study of correct reasoning" },
+    { "word": "DATA", "definition": "raw, unprocessed facts, measurements, or observations that exist without context or meaning on their own" },
     { "word": "CODE", "definition": "System of words, letters, or signs used to represent instructions" },
     { "word": "ARRAY", "definition": "A collection of the similar type of data items" },
-    { "word": "FUN", "definition": "Enjoyment, amusement, or lighthearted pleasure" },
-    { "word": "BINARY", "definition": "Relating to, composed of, or involving two things" },
+    { "word": "FUNCTION", "definition": "A group of instructions, used by programming languages to return a single result or a set of results" },
+    { "word": "BINARY", "definition": "A system using only two things or symbols, typically 0 and 1" },
     { "word": "SCIENCE", "definition": "Systematic study of the structure of the physical world" },
     { "word": "SOFT", "definition": "Not hard; easy to mold or cut" },
     { "word": "WAV", "definition": "A sound format (pronounced wave) used to reproduce sounds on a computer." },
