@@ -46,7 +46,7 @@ function getAllValidClues(phraseText) {
     return valid;
 }
 
-function selectCoveringClues(phraseText, maxClues = 6) {
+function selectCoveringClues(phraseText, maxClues = 16) {
     const phraseLettersSet = getUniqueLetters(phraseText);
     const requiredLetters = new Set(phraseLettersSet);
     const validClues = getAllValidClues(phraseText);
@@ -242,12 +242,17 @@ function moveToNextEmpty(currentInput) {
     if (nextEmpty) nextEmpty.focus();
 }
 
+function toSentenceCase(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 function handleWin() {
     if (gameWon) return;
     gameWon = true;
     gameActive = false;
     winMessageDiv.style.display = 'block';
-    showStatusMessage("🎉 PERFECT! You solved the puzzle! 🎉", false, true);
+    showStatusMessage("🎉 PERFECT! You solved the puzzle! 🎉"+` "${toSentenceCase(currentPhraseText)}"`, false, true);
     const allInputs = document.querySelectorAll('input[data-num]');
     allInputs.forEach(inp => inp.disabled = true);
     attemptCounterSpan.textContent = "✨ Puzzle completed! ✨";
