@@ -129,7 +129,24 @@ function renderGame() {
         }
         mainPhraseContainer.appendChild(wordBlock);
     });
-    
+/*
+    // Inside renderGame():
+    const clueWords = clue.word.split(' ');
+    clueWords.forEach(word => {
+        const wordBlock = document.createElement('div');
+        wordBlock.style.display = 'flex';
+        wordBlock.style.marginRight = '8px'; // Spacing between words
+        
+        for (let letter of word) {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            const num = currentLetterMap[letter];
+            tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
+            wordBlock.appendChild(tile);
+        }
+        inputsDiv.appendChild(wordBlock);
+    });
+    */
     currentClues.forEach(clue => {
         const row = document.createElement('div');
         row.className = 'clue-row';
