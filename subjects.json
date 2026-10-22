@@ -7,10 +7,10 @@
       "clues": "computer-science/clues.json"
     },
     {
-      "id": "c-programming",
-      "name": "C Programming",
-      "phrases": "c-programming/phrases.json",
-      "clues": "c-programming/clues.json"
+      "id": "c-language",
+      "name": "C Programming Language",
+      "phrases": "c-language/phrases.json",
+      "clues": "c-language/clues.json"
     },
     {
       "id": "java",
