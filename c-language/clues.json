@@ -1,6 +1,8 @@
 {
   "cluePool": [
     { "word": "PROGRAMMING", "definition": "The process of writing instructions that tell a computer how to perform a task" },
+    { "word": "PROCEDURAL", "definition": "A style of programming focused on step-by-step instructions and breaking code into reusable blocks called functions or procedures" },
+    { "word": "GENERAL-PURPOSE", "definition": "Designed to be useful for many different types of tasks rather than just one specific job."},
     { "word": "LANGUAGE", "definition": "A formal system of syntax and rules used to communicate instructions to a computer" },
     { "word": "OPERATING", "definition": "Relating to the system software that manages computer hardware and software resources (e.g., Windows, Unix)" },
     { "word": "SYSTEM", "definition": "A set of connected things or software that work together as a whole" },
@@ -31,6 +33,7 @@
     { "word": "MODIFICATION", "definition": "A change or adjustment made to a program's code" },
     { "word": "COMPUTER", "definition": "An electronic device that accepts data, processes it, and stores the results" },
     { "word": "LANGUAGES", "definition": "Systems of communication used to write software (e.g., C++, Java, Python)" },
-    { "word": "DIRECTLY", "definition": "Without any middle steps or intermediary processes" }
+    { "word": "DIRECTLY", "definition": "Without any middle steps or intermediary processes" },
+    { "word": "PROCEDURE", "definition": "A reusable block of code that performs a specific task, often called a function" }
   ]
 }
