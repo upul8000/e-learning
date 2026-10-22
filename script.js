@@ -298,12 +298,36 @@ function verifySolution() {
     }
 }
 
+// --- NEW HELPERS -------------------------------------------------
+
+// A letter can appear in several boxes (main phrase + clue rows).
+// Because they are synced by data-num, clearing must clear every copy,
+// otherwise the remaining copies would still hold the letter and the
+// puzzle could never be considered "solved" again.
+function clearInputAndCopies(input) {
+    const num = input.getAttribute('data-num');
+    document.querySelectorAll(`input[data-num="${num}"]`).forEach(inp => {
+        inp.value = '';
+    });
+}
+
+// The box immediately before this one in the document order
+function getPreviousInput(currentInput) {
+    const allInputs = Array.from(document.querySelectorAll('input[data-num]'));
+    const idx = allInputs.indexOf(currentInput);
+    if (idx <= 0) return null;              // already at the first box
+    return allInputs[idx - 1];
+}
+
+// --- UPDATED FUNCTION --------------------------------------------
+
 function attachSyncAndWinDetection() {
     const allInputs = document.querySelectorAll('input[data-num]');
     allInputs.forEach(input => {
         const newInput = input.cloneNode(true);
         input.parentNode.replaceChild(newInput, input);
     });
+
     const freshInputs = document.querySelectorAll('input[data-num]');
     freshInputs.forEach(input => {
         input.addEventListener('input', (e) => {
@@ -326,12 +350,36 @@ function attachSyncAndWinDetection() {
                 handleWin();
             }
         });
+
         input.addEventListener('keydown', (e) => {
-            if (e.key === ' ' || e.key === 'Space') e.preventDefault();
+            // keep Space out of the boxes
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                return;
+            }
+
+            // ---- BACKSPACE: clear boxes one by one, walking backward ----
+            if (e.key === 'Backspace') {
+                e.preventDefault();
+                if (!gameActive || gameWon) return;
+
+                if (e.target.value !== '') {
+                    // Box has a letter -> clear it, then step back one box
+                    clearInputAndCopies(e.target);
+                    const prev = getPreviousInput(e.target);
+                    if (prev) prev.focus();
+                } else {
+                    // Box already empty -> step back and clear that box
+                    const prev = getPreviousInput(e.target);
+                    if (prev) {
+                        clearInputAndCopies(prev);
+                        prev.focus();
+                    }
+                }
+            }
         });
     });
 }
-
 function enableGame() {
     checkBtn.disabled = false;
     resetBtn.disabled = false;
