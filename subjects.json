@@ -7,16 +7,16 @@
       "clues": "computer-science/clues.json"
     },
     {
-      "id": "biology",
-      "name": "Biology",
-      "phrases": "biology/phrases.json",
-      "clues": "biology/clues.json"
+      "id": "c-programming",
+      "name": "C Programming",
+      "phrases": "c-programming/phrases.json",
+      "clues": "c-programming/clues.json"
     },
     {
-      "id": "history",
-      "name": "History",
-      "phrases": "history/phrases.json",
-      "clues": "history/clues.json"
+      "id": "java",
+      "name": "Java",
+      "phrases": "java/phrases.json",
+      "clues": "java/clues.json"
     }
   ]
 }
