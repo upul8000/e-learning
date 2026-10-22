@@ -20,11 +20,26 @@
             <button id="check-btn" class="action-btn" disabled>✓ Check Solution</button>
             <button id="reset-btn" class="action-btn" disabled>⟳ Reset Puzzle</button>
             <button id="next-btn" class="action-btn" disabled>⏩ Next Puzzle</button>
+            <button id="subject-btn" disabled>Change Subject</button>
         </div>
         <div id="attempt-counter">❌ Incorrect checks: 0 / 3</div>
     </div>
 
     <div id="win-message" style="display: none;">🎉 Congratulations! You solved the puzzle!</div>
+</div>
+
+<!-- Subject selection popup -->
+<div id="subject-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Choose a Subject</h2>
+    <p class="modal-sub">Select a subject to start playing.</p>
+    <div id="subject-list" class="subject-list">
+      <div class="loading">Loading subjects…</div>
+    </div>
+    <button id="cancel-subject-btn" class="subject-btn" style="display:none; margin-top:14px;">
+      Cancel
+    </button>
+  </div>
 </div>
 
 <script src="script.js"></script>

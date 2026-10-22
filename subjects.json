@@ -1,0 +1,22 @@
+{
+  "subjects": [
+    {
+      "id": "computer-science",
+      "name": "Computer Science",
+      "phrases": "computer-science/phrases.json",
+      "clues": "computer-science/clues.json"
+    },
+    {
+      "id": "biology",
+      "name": "Biology",
+      "phrases": "biology/phrases.json",
+      "clues": "biology/clues.json"
+    },
+    {
+      "id": "history",
+      "name": "History",
+      "phrases": "history/phrases.json",
+      "clues": "history/clues.json"
+    }
+  ]
+}

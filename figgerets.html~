@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Figgerits Clone | CS Phrases + External Data</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Figgerits Logic Puzzle</h1>
+    
+    <div id="main-phrase" class="loading">Loading puzzles...</div>
+    <div id="clues-container"></div>
+
+    <div class="game-status">
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        <div class="action-buttons">
+            <button id="check-btn" class="action-btn" disabled>✓ Check Solution</button>
+            <button id="reset-btn" class="action-btn" disabled>⟳ Reset Puzzle</button>
+            <button id="next-btn" class="action-btn" disabled>⏩ Next Puzzle</button>
+        </div>
+        <div id="attempt-counter">❌ Incorrect checks: 0 / 3</div>
+    </div>
+
+    <div id="win-message" style="display: none;">🎉 Congratulations! You solved the puzzle!</div>
+</div>
+
+<!-- Subject selection popup -->
+<div id="subject-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Choose a Subject</h2>
+    <p class="modal-sub">Select a subject to start playing.</p>
+    <div id="subject-list" class="subject-list">
+      <div class="loading">Loading subjects…</div>
+    </div>
+    <button id="cancel-subject-btn" class="subject-btn" style="display:none; margin-top:14px;">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

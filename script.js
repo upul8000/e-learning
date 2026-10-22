@@ -336,42 +336,103 @@ function enableGame() {
     checkBtn.disabled = false;
     resetBtn.disabled = false;
     nextBtn.disabled = false;
+    subjectBtn.disabled = false;      // <-- new
 }
 
-async function loadData() {
+// --------------------------------------------------------------
+// SUBJECT SELECTION + DATA LOADING
+// --------------------------------------------------------------
+const subjectModal     = document.getElementById('subject-modal');
+const subjectListDiv   = document.getElementById('subject-list');
+const cancelSubjectBtn = document.getElementById('cancel-subject-btn');
+const subjectBtn       = document.getElementById('subject-btn');
+
+let availableSubjects = [];
+let currentSubject    = null;   // the manifest entry currently loaded
+
+async function loadSubjects() {
     try {
-        const phrasesRes = await fetch('phrases.json');
-        const cluesRes = await fetch('cluesPool.json');
-        
-        if (!phrasesRes.ok || !cluesRes.ok) throw new Error('Failed to load data files');
-        
-        const phrasesData = await phrasesRes.json();
-        const cluesData = await cluesRes.json();
-        
-        phraseList = phrasesData.phrases;
-        cluePool = cluesData.cluePool;
-        
-        if (!phraseList.length || !cluePool.length) throw new Error('Empty data');
-        
-        dataLoaded = true;
-        enableGame();
-        
-        currentPhraseText = phraseList[0].text.toUpperCase();
-        currentClues = selectCoveringClues(currentPhraseText, 6);
-        if (currentClues.length === 0) {
-            currentClues = getAllValidClues(currentPhraseText).slice(0, 4);
-        }
-        currentLetterMap = buildLetterMap(currentPhraseText);
-        renderGame();
-        updateAttemptDisplay();
-        
-    } catch (error) {
-        console.error(error);
-        mainPhraseContainer.innerHTML = '<div class="loading" style="color:red;">Error loading puzzles. Make sure phrases.json and cluesPool.json are in the same folder.</div>';
+        const res = await fetch('subjects.json');
+        if (!res.ok) throw new Error('Failed to load subjects.json');
+        const data = await res.json();
+        availableSubjects = data.subjects || [];
+        if (!availableSubjects.length) throw new Error('No subjects defined in subjects.json');
+        renderSubjectList();
+    } catch (err) {
+        console.error(err);
+        subjectListDiv.innerHTML =
+            '<div class="loading" style="color:red;">Could not load subjects. ' +
+            'Make sure subjects.json exists and the app is served from a local web server ' +
+            '(e.g. <code>python -m http.server</code>).</div>';
     }
 }
 
-loadData();
+function renderSubjectList() {
+    subjectListDiv.innerHTML = '';
+    availableSubjects.forEach(sub => {
+        const btn = document.createElement('button');
+        btn.className = 'subject-btn';
+        if (currentSubject && currentSubject.id === sub.id) {
+            btn.classList.add('active');
+        }
+        btn.textContent = sub.name;
+        btn.addEventListener('click', () => selectSubject(sub));
+        subjectListDiv.appendChild(btn);
+    });
+    // Cancel is only offered once a subject is already in play
+    cancelSubjectBtn.style.display = currentSubject ? 'block' : 'none';
+}
+
+function openSubjectModal() {
+    renderSubjectList();
+    subjectModal.classList.remove('hidden');
+}
+
+function closeSubjectModal() {
+    subjectModal.classList.add('hidden');
+}
+
+async function selectSubject(subject) {
+    try {
+        const [phrasesRes, cluesRes] = await Promise.all([
+            fetch(subject.phrases),
+            fetch(subject.clues)
+        ]);
+        if (!phrasesRes.ok || !cluesRes.ok) {
+            throw new Error(`Failed to load files for "${subject.name}"`);
+        }
+        const phrasesData = await phrasesRes.json();
+        const cluesData   = await cluesRes.json();
+
+        // Accept both bare arrays and { phrases: [...] } / { cluePool: [...] }
+        const newPhrases = Array.isArray(phrasesData) ? phrasesData : phrasesData.phrases;
+        const newClues   = Array.isArray(cluesData)   ? cluesData   : cluesData.cluePool;
+
+        if (!newPhrases || !newPhrases.length || !newClues || !newClues.length) {
+            throw new Error(`"${subject.name}" has empty puzzle data`);
+        }
+
+        phraseList = newPhrases;
+        cluePool   = newClues;
+        currentSubject = subject;
+        dataLoaded = true;
+
+        enableGame();
+        closeSubjectModal();
+        loadPuzzle(0);                 // full re-render, resets counters, starts at phrase 0
+    } catch (err) {
+        console.error(err);
+        showStatusMessage('Error loading subject: ' + err.message, true);
+    }
+}
+
+// "Change Subject" button re-opens the popup (current game stays until a new subject is picked)
+subjectBtn.addEventListener('click', openSubjectModal);
+
+// Cancel returns to the current game without changing anything
+cancelSubjectBtn.addEventListener('click', closeSubjectModal);
+
+loadSubjects();
 
 checkBtn.addEventListener('click', verifySolution);
 resetBtn.addEventListener('click', resetCurrentPuzzle);
