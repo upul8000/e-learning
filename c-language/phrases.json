@@ -26,6 +26,6 @@
     { "text": "C provides a rich set of control flow statements" },
     { "text": "C allows programmers to closely manage a computer’s memory and processor." },
     { "text": "Despite being a relatively old language, C remains widely used." },
-    { "text": "C is widely used for embedded systems, OS development, and high-performance applications." },
+    { "text": "C is widely used for embedded systems, OS development, and high-performance applications." }
   ]
 }
