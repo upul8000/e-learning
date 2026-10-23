@@ -46,55 +46,38 @@ function getAllValidClues(phraseText) {
     return valid;
 }
 
-function selectCoveringClues(phraseText, maxClues = 16) {
+function selectCoveringClues(phraseText) {
     const phraseLettersSet = getUniqueLetters(phraseText);
     const requiredLetters = new Set(phraseLettersSet);
+    
+    // 1. Get all clues that ONLY contain letters present in the phrase
     const validClues = getAllValidClues(phraseText);
     
     if (validClues.length === 0) return [];
     
-    const sortedClues = [...validClues].sort((a, b) => a.word.length - b.word.length);
+    // 2. Shuffle the valid clues randomly (Fisher-Yates shuffle)
+    const shuffledClues = [...validClues];
+    for (let i = shuffledClues.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledClues[i], shuffledClues[j]] = [shuffledClues[j], shuffledClues[i]];
+    }
+    
     const selected = [];
     const covered = new Set();
     
-    while (covered.size < requiredLetters.size && selected.length < maxClues) {
-        let bestClue = null;
-        let bestNewCoverage = 0;
+    // 3. Loop through the shuffled clues and add them until all letters are covered
+    for (let clue of shuffledClues) {
+        // If we have already covered all required letters, stop adding clues
+        if (covered.size === requiredLetters.size) break;
         
-        for (let clue of sortedClues) {
-            if (selected.includes(clue)) continue;
-            const clueLetters = new Set(clue.word.toUpperCase().split(''));
-            let newCount = 0;
-            for (let letter of clueLetters) {
-                if (requiredLetters.has(letter) && !covered.has(letter)) newCount++;
-            }
-            if (newCount > bestNewCoverage) {
-                bestNewCoverage = newCount;
-                bestClue = clue;
-            }
-        }
+        selected.push(clue);
         
-        if (bestClue === null) break;
-        
-        selected.push(bestClue);
-        const newLetters = new Set(bestClue.word.toUpperCase().split(''));
-        for (let letter of newLetters) {
-            if (requiredLetters.has(letter)) covered.add(letter);
-        }
-    }
-    
-    if (covered.size < requiredLetters.size) {
-        for (let clue of validClues) {
-            const clueLetters = new Set(clue.word.toUpperCase().split(''));
-            let missing = false;
-            for (let letter of requiredLetters) {
-                if (!covered.has(letter) && clueLetters.has(letter)) {
-                    covered.add(letter);
-                    missing = true;
-                }
+        // Mark the letters in this clue as covered
+        const clueLetters = new Set(clue.word.toUpperCase().replace(/[^A-Z]/g, '').split(''));
+        for (let letter of clueLetters) {
+            if (requiredLetters.has(letter)) {
+                covered.add(letter);
             }
-            if (missing && !selected.includes(clue)) selected.push(clue);
-            if (covered.size === requiredLetters.size) break;
         }
     }
     
@@ -129,24 +112,7 @@ function renderGame() {
         }
         mainPhraseContainer.appendChild(wordBlock);
     });
-/*
-    // Inside renderGame():
-    const clueWords = clue.word.split(' ');
-    clueWords.forEach(word => {
-        const wordBlock = document.createElement('div');
-        wordBlock.style.display = 'flex';
-        wordBlock.style.marginRight = '8px'; // Spacing between words
-        
-        for (let letter of word) {
-            const tile = document.createElement('div');
-            tile.className = 'tile';
-            const num = currentLetterMap[letter];
-            tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
-            wordBlock.appendChild(tile);
-        }
-        inputsDiv.appendChild(wordBlock);
-    });
-    */
+    
     currentClues.forEach(clue => {
         const row = document.createElement('div');
         row.className = 'clue-row';
@@ -155,13 +121,25 @@ function renderGame() {
         textDiv.innerHTML = `<strong>Definition:</strong> ${clue.definition}`;
         const inputsDiv = document.createElement('div');
         inputsDiv.className = 'clue-inputs';
-        for (let letter of clue.word) {
-            const tile = document.createElement('div');
-            tile.className = 'tile';
-            const num = currentLetterMap[letter];
-            tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
-            inputsDiv.appendChild(tile);
-        }
+        
+        // --- NEW MULTI-WORD SUPPORT CODE ---
+        const clueWords = clue.word.split(' ');
+        clueWords.forEach(word => {
+            const wordBlock = document.createElement('div');
+            wordBlock.style.display = 'flex';
+            wordBlock.style.marginRight = '12px'; // Adds space between multiple words
+            
+            for (let letter of word) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                const num = currentLetterMap[letter];
+                tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
+                wordBlock.appendChild(tile);
+            }
+            inputsDiv.appendChild(wordBlock);
+        });
+        // -----------------------------------
+        
         row.appendChild(textDiv);
         row.appendChild(inputsDiv);
         cluesContainer.appendChild(row);
@@ -195,10 +173,12 @@ function loadPuzzle(index) {
     if (index < 0) index = phraseList.length - 1;
     currentPhraseIndex = index;
     currentPhraseText = phraseList[currentPhraseIndex].text.toUpperCase();
-    currentClues = selectCoveringClues(currentPhraseText, 6);
+    currentClues = selectCoveringClues(currentPhraseText);
+    /*
     if (currentClues.length === 0) {
         currentClues = getAllValidClues(currentPhraseText).slice(0, 4);
     }
+    */
     currentLetterMap = buildLetterMap(currentPhraseText);
     
     incorrectAttempts = 0;

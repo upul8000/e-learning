@@ -1,0 +1,499 @@
+// --------------------------------------------------------------
+// EXTERNAL DATA LOADING
+// --------------------------------------------------------------
+let phraseList = [];
+let cluePool = [];
+let currentPhraseIndex = 0;
+let currentPhraseText = "";
+let currentClues = [];
+let currentLetterMap = {};
+
+// Game state
+let incorrectAttempts = 0;
+let gameActive = true;
+let gameWon = false;
+let dataLoaded = false;
+
+// DOM elements
+const mainPhraseContainer = document.getElementById('main-phrase');
+const cluesContainer = document.getElementById('clues-container');
+const winMessageDiv = document.getElementById('win-message');
+const statusMsgDiv = document.getElementById('status-message');
+const attemptCounterSpan = document.getElementById('attempt-counter');
+const checkBtn = document.getElementById('check-btn');
+const resetBtn = document.getElementById('reset-btn');
+const nextBtn = document.getElementById('next-btn');
+
+// Helper functions
+function getUniqueLetters(phraseText) {
+    return new Set(phraseText.replace(/[^A-Z]/g, ''));
+}
+
+function getAllValidClues(phraseText) {
+    const phraseLetters = getUniqueLetters(phraseText);
+    const valid = [];
+    for (let clue of cluePool) {
+        const wordLetters = clue.word.toUpperCase();
+        let allPresent = true;
+        for (let ch of wordLetters) {
+            if (!phraseLetters.has(ch)) {
+                allPresent = false;
+                break;
+            }
+        }
+        if (allPresent) valid.push(clue);
+    }
+    return valid;
+}
+
+function selectCoveringClues(phraseText, maxClues = 16) {
+    const phraseLettersSet = getUniqueLetters(phraseText);
+    const requiredLetters = new Set(phraseLettersSet);
+    const validClues = getAllValidClues(phraseText);
+    
+    if (validClues.length === 0) return [];
+    
+    const sortedClues = [...validClues].sort((a, b) => a.word.length - b.word.length);
+    const selected = [];
+    const covered = new Set();
+    
+    while (covered.size < requiredLetters.size && selected.length < maxClues) {
+        let bestClue = null;
+        let bestNewCoverage = 0;
+        
+        for (let clue of sortedClues) {
+            if (selected.includes(clue)) continue;
+            const clueLetters = new Set(clue.word.toUpperCase().split(''));
+            let newCount = 0;
+            for (let letter of clueLetters) {
+                if (requiredLetters.has(letter) && !covered.has(letter)) newCount++;
+            }
+            if (newCount > bestNewCoverage) {
+                bestNewCoverage = newCount;
+                bestClue = clue;
+            }
+        }
+        
+        if (bestClue === null) break;
+        
+        selected.push(bestClue);
+        const newLetters = new Set(bestClue.word.toUpperCase().split(''));
+        for (let letter of newLetters) {
+            if (requiredLetters.has(letter)) covered.add(letter);
+        }
+    }
+    
+    if (covered.size < requiredLetters.size) {
+        for (let clue of validClues) {
+            const clueLetters = new Set(clue.word.toUpperCase().split(''));
+            let missing = false;
+            for (let letter of requiredLetters) {
+                if (!covered.has(letter) && clueLetters.has(letter)) {
+                    covered.add(letter);
+                    missing = true;
+                }
+            }
+            if (missing && !selected.includes(clue)) selected.push(clue);
+            if (covered.size === requiredLetters.size) break;
+        }
+    }
+    
+    return selected;
+}
+
+function buildLetterMap(phraseText) {
+    const uniqueLetters = [...new Set(phraseText.replace(/[^A-Z]/g, ''))];
+    const map = {};
+    uniqueLetters.forEach((letter, idx) => { map[letter] = idx + 1; });
+    return map;
+}
+
+function renderGame() {
+    mainPhraseContainer.innerHTML = '';
+    cluesContainer.innerHTML = '';
+    
+    const words = currentPhraseText.split(' ');
+    words.forEach(word => {
+        const wordBlock = document.createElement('div');
+        wordBlock.className = 'word-block';
+        for (let ch of word) {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            if (/[A-Z]/.test(ch)) {
+                const num = currentLetterMap[ch];
+                tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${ch}"><span>${num}</span>`;
+            } else {
+                tile.innerHTML = `<span style="font-size:24px; font-weight:bold; line-height:34px;">${ch}</span>`;
+            }
+            wordBlock.appendChild(tile);
+        }
+        mainPhraseContainer.appendChild(wordBlock);
+    });
+    
+    currentClues.forEach(clue => {
+        const row = document.createElement('div');
+        row.className = 'clue-row';
+        const textDiv = document.createElement('div');
+        textDiv.className = 'clue-text';
+        textDiv.innerHTML = `<strong>Definition:</strong> ${clue.definition}`;
+        const inputsDiv = document.createElement('div');
+        inputsDiv.className = 'clue-inputs';
+        
+        // --- NEW MULTI-WORD SUPPORT CODE ---
+        const clueWords = clue.word.split(' ');
+        clueWords.forEach(word => {
+            const wordBlock = document.createElement('div');
+            wordBlock.style.display = 'flex';
+            wordBlock.style.marginRight = '12px'; // Adds space between multiple words
+            
+            for (let letter of word) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                const num = currentLetterMap[letter];
+                tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
+                wordBlock.appendChild(tile);
+            }
+            inputsDiv.appendChild(wordBlock);
+        });
+        // -----------------------------------
+        
+        row.appendChild(textDiv);
+        row.appendChild(inputsDiv);
+        cluesContainer.appendChild(row);
+    });
+    
+    attachSyncAndWinDetection();
+}
+
+function resetCurrentPuzzle() {
+    if (!dataLoaded) return;
+    incorrectAttempts = 0;
+    gameActive = true;
+    gameWon = false;
+    winMessageDiv.style.display = 'none';
+    statusMsgDiv.style.display = 'none';
+    updateAttemptDisplay();
+    const allInputs = document.querySelectorAll('input[data-num]');
+    allInputs.forEach(inp => {
+        inp.disabled = false;
+        inp.value = '';
+    });
+    showStatusMessage("Puzzle reset. Good luck!", false);
+    setTimeout(() => {
+        if (statusMsgDiv.textContent.includes("reset")) statusMsgDiv.style.display = 'none';
+    }, 1500);
+}
+
+function loadPuzzle(index) {
+    if (!dataLoaded) return;
+    if (index >= phraseList.length) index = 0;
+    if (index < 0) index = phraseList.length - 1;
+    currentPhraseIndex = index;
+    currentPhraseText = phraseList[currentPhraseIndex].text.toUpperCase();
+    currentClues = selectCoveringClues(currentPhraseText, 6);
+    if (currentClues.length === 0) {
+        currentClues = getAllValidClues(currentPhraseText).slice(0, 4);
+    }
+    currentLetterMap = buildLetterMap(currentPhraseText);
+    
+    incorrectAttempts = 0;
+    gameActive = true;
+    gameWon = false;
+    winMessageDiv.style.display = 'none';
+    statusMsgDiv.style.display = 'none';
+    updateAttemptDisplay();
+    attemptCounterSpan.style.color = "#475569";
+    renderGame();
+    showStatusMessage(`New puzzle: "${currentPhraseText}"`, false);
+    setTimeout(() => {
+        if (statusMsgDiv.textContent.includes("New puzzle")) statusMsgDiv.style.display = 'none';
+    }, 2000);
+}
+
+function updateAttemptDisplay() {
+    if (!gameActive || gameWon) return;
+    attemptCounterSpan.textContent = `❌ Incorrect checks: ${incorrectAttempts} / 3`;
+    if (incorrectAttempts >= 3) {
+        attemptCounterSpan.style.color = "#b91c1c";
+    } else {
+        attemptCounterSpan.style.color = "#475569";
+    }
+}
+
+function showStatusMessage(text, isError = false, isWin = false) {
+    statusMsgDiv.style.display = 'block';
+    statusMsgDiv.textContent = text;
+    statusMsgDiv.classList.remove('win-msg', 'loss-msg');
+    if (isWin) {
+        statusMsgDiv.classList.add('win-msg');
+    } else if (isError) {
+        statusMsgDiv.classList.add('loss-msg');
+    } else {
+        statusMsgDiv.classList.add('loss-msg');
+    }
+    if (!isWin && incorrectAttempts < 3 && gameActive) {
+        setTimeout(() => {
+            if (statusMsgDiv.textContent === text) statusMsgDiv.style.display = 'none';
+        }, 2500);
+    }
+}
+
+function getNextEmptyInput(currentInput) {
+    const allInputs = Array.from(document.querySelectorAll('input[data-num]'));
+    const currentIndex = allInputs.indexOf(currentInput);
+    if (currentIndex === -1) return null;
+    for (let i = currentIndex + 1; i < allInputs.length; i++) {
+        const inp = allInputs[i];
+        if (!inp.disabled && inp.value.trim() === '') return inp;
+    }
+    return null;
+}
+
+function moveToNextEmpty(currentInput) {
+    const nextEmpty = getNextEmptyInput(currentInput);
+    if (nextEmpty) nextEmpty.focus();
+}
+
+function toSentenceCase(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+function handleWin() {
+    if (gameWon) return;
+    gameWon = true;
+    gameActive = false;
+    winMessageDiv.style.display = 'block';
+    showStatusMessage("🎉 PERFECT! You solved the puzzle! 🎉"+` "${toSentenceCase(currentPhraseText)}"`, false, true);
+    const allInputs = document.querySelectorAll('input[data-num]');
+    allInputs.forEach(inp => inp.disabled = true);
+    attemptCounterSpan.textContent = "✨ Puzzle completed! ✨";
+}
+
+function handleLoss() {
+    if (gameWon) return;
+    gameActive = false;
+    gameWon = false;
+    const allInputs = document.querySelectorAll('input[data-num]');
+    allInputs.forEach(inp => inp.disabled = true);
+    showStatusMessage("💀 GAME OVER – You lost! Press 'Reset Puzzle' to try again.", true);
+    attemptCounterSpan.textContent = "❌ Maximum incorrect attempts reached. Game over.";
+    attemptCounterSpan.style.color = "#b91c1c";
+}
+
+function isPuzzleSolved() {
+    const allInputs = document.querySelectorAll('input[data-num]');
+    for (let inp of allInputs) {
+        const expected = inp.getAttribute('data-char');
+        if (inp.value.toUpperCase() !== expected) return false;
+    }
+    return true;
+}
+
+function verifySolution() {
+    if (!gameActive) {
+        if (gameWon) showStatusMessage("You already won! Press Next Puzzle or Reset.", false);
+        else showStatusMessage("Game over! Reset the puzzle to continue.", true);
+        return;
+    }
+    if (isPuzzleSolved()) {
+        handleWin();
+    } else {
+        incorrectAttempts++;
+        updateAttemptDisplay();
+        if (incorrectAttempts >= 3) {
+            handleLoss();
+        } else {
+            const remaining = 3 - incorrectAttempts;
+            showStatusMessage(`❌ Incorrect solution! ${remaining} ${remaining === 1 ? 'attempt' : 'attempts'} left.`, true);
+        }
+    }
+}
+
+// --- NEW HELPERS -------------------------------------------------
+
+// A letter can appear in several boxes (main phrase + clue rows).
+// Because they are synced by data-num, clearing must clear every copy,
+// otherwise the remaining copies would still hold the letter and the
+// puzzle could never be considered "solved" again.
+function clearInputAndCopies(input) {
+    const num = input.getAttribute('data-num');
+    document.querySelectorAll(`input[data-num="${num}"]`).forEach(inp => {
+        inp.value = '';
+    });
+}
+
+// The box immediately before this one in the document order
+function getPreviousInput(currentInput) {
+    const allInputs = Array.from(document.querySelectorAll('input[data-num]'));
+    const idx = allInputs.indexOf(currentInput);
+    if (idx <= 0) return null;              // already at the first box
+    return allInputs[idx - 1];
+}
+
+// --- UPDATED FUNCTION --------------------------------------------
+
+function attachSyncAndWinDetection() {
+    const allInputs = document.querySelectorAll('input[data-num]');
+    allInputs.forEach(input => {
+        const newInput = input.cloneNode(true);
+        input.parentNode.replaceChild(newInput, input);
+    });
+
+    const freshInputs = document.querySelectorAll('input[data-num]');
+    freshInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+            if (!gameActive) return;
+            let raw = e.target.value.toUpperCase();
+            let filtered = raw.replace(/[^A-Z]/g, '');
+            if (filtered.length > 1) filtered = filtered.charAt(0);
+            const oldValue = e.target.value;
+            e.target.value = filtered;
+            const num = e.target.getAttribute('data-num');
+            document.querySelectorAll(`input[data-num="${num}"]`).forEach(syncInp => {
+                if (syncInp !== e.target && syncInp.value !== filtered) {
+                    syncInp.value = filtered;
+                }
+            });
+            if (filtered !== "" && (oldValue === "" || filtered !== oldValue)) {
+                moveToNextEmpty(e.target);
+            }
+            if (gameActive && !gameWon && isPuzzleSolved()) {
+                handleWin();
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            // keep Space out of the boxes
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                return;
+            }
+
+            // ---- BACKSPACE: clear boxes one by one, walking backward ----
+            if (e.key === 'Backspace') {
+                e.preventDefault();
+                if (!gameActive || gameWon) return;
+
+                if (e.target.value !== '') {
+                    // Box has a letter -> clear it, then step back one box
+                    clearInputAndCopies(e.target);
+                    const prev = getPreviousInput(e.target);
+                    if (prev) prev.focus();
+                } else {
+                    // Box already empty -> step back and clear that box
+                    const prev = getPreviousInput(e.target);
+                    if (prev) {
+                        clearInputAndCopies(prev);
+                        prev.focus();
+                    }
+                }
+            }
+        });
+    });
+}
+function enableGame() {
+    checkBtn.disabled = false;
+    resetBtn.disabled = false;
+    nextBtn.disabled = false;
+    subjectBtn.disabled = false;      // <-- new
+}
+
+// --------------------------------------------------------------
+// SUBJECT SELECTION + DATA LOADING
+// --------------------------------------------------------------
+const subjectModal     = document.getElementById('subject-modal');
+const subjectListDiv   = document.getElementById('subject-list');
+const cancelSubjectBtn = document.getElementById('cancel-subject-btn');
+const subjectBtn       = document.getElementById('subject-btn');
+
+let availableSubjects = [];
+let currentSubject    = null;   // the manifest entry currently loaded
+
+async function loadSubjects() {
+    try {
+        const res = await fetch('subjects.json');
+        if (!res.ok) throw new Error('Failed to load subjects.json');
+        const data = await res.json();
+        availableSubjects = data.subjects || [];
+        if (!availableSubjects.length) throw new Error('No subjects defined in subjects.json');
+        renderSubjectList();
+    } catch (err) {
+        console.error(err);
+        subjectListDiv.innerHTML =
+            '<div class="loading" style="color:red;">Could not load subjects. ' +
+            'Make sure subjects.json exists and the app is served from a local web server ' +
+            '(e.g. <code>python -m http.server</code>).</div>';
+    }
+}
+
+function renderSubjectList() {
+    subjectListDiv.innerHTML = '';
+    availableSubjects.forEach(sub => {
+        const btn = document.createElement('button');
+        btn.className = 'subject-btn';
+        if (currentSubject && currentSubject.id === sub.id) {
+            btn.classList.add('active');
+        }
+        btn.textContent = sub.name;
+        btn.addEventListener('click', () => selectSubject(sub));
+        subjectListDiv.appendChild(btn);
+    });
+    // Cancel is only offered once a subject is already in play
+    cancelSubjectBtn.style.display = currentSubject ? 'block' : 'none';
+}
+
+function openSubjectModal() {
+    renderSubjectList();
+    subjectModal.classList.remove('hidden');
+}
+
+function closeSubjectModal() {
+    subjectModal.classList.add('hidden');
+}
+
+async function selectSubject(subject) {
+    try {
+        const [phrasesRes, cluesRes] = await Promise.all([
+            fetch(subject.phrases),
+            fetch(subject.clues)
+        ]);
+        if (!phrasesRes.ok || !cluesRes.ok) {
+            throw new Error(`Failed to load files for "${subject.name}"`);
+        }
+        const phrasesData = await phrasesRes.json();
+        const cluesData   = await cluesRes.json();
+
+        // Accept both bare arrays and { phrases: [...] } / { cluePool: [...] }
+        const newPhrases = Array.isArray(phrasesData) ? phrasesData : phrasesData.phrases;
+        const newClues   = Array.isArray(cluesData)   ? cluesData   : cluesData.cluePool;
+
+        if (!newPhrases || !newPhrases.length || !newClues || !newClues.length) {
+            throw new Error(`"${subject.name}" has empty puzzle data`);
+        }
+
+        phraseList = newPhrases;
+        cluePool   = newClues;
+        currentSubject = subject;
+        dataLoaded = true;
+
+        enableGame();
+        closeSubjectModal();
+        loadPuzzle(0);                 // full re-render, resets counters, starts at phrase 0
+    } catch (err) {
+        console.error(err);
+        showStatusMessage('Error loading subject: ' + err.message, true);
+    }
+}
+
+// "Change Subject" button re-opens the popup (current game stays until a new subject is picked)
+subjectBtn.addEventListener('click', openSubjectModal);
+
+// Cancel returns to the current game without changing anything
+cancelSubjectBtn.addEventListener('click', closeSubjectModal);
+
+loadSubjects();
+
+checkBtn.addEventListener('click', verifySolution);
+resetBtn.addEventListener('click', resetCurrentPuzzle);
+nextBtn.addEventListener('click', () => loadPuzzle(currentPhraseIndex + 1));
