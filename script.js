@@ -359,7 +359,7 @@ function attachSyncAndWinDetection() {
         const newInput = input.cloneNode(true);
         input.parentNode.replaceChild(newInput, input);
     });
-
+    
     const freshInputs = document.querySelectorAll('input[data-num]');
     freshInputs.forEach(input => {
         input.addEventListener('input', (e) => {
@@ -382,7 +382,7 @@ function attachSyncAndWinDetection() {
                 handleWin();
             }
         });
-
+        
         input.addEventListener('keydown', (e) => {
             // keep Space out of the boxes
             if (e.key === ' ' || e.key === 'Space') {
@@ -390,18 +390,17 @@ function attachSyncAndWinDetection() {
                 return;
             }
 
-            // ---- BACKSPACE: clear boxes one by one, walking backward ----
+            // ---- BACKSPACE LOGIC ----
             if (e.key === 'Backspace') {
                 e.preventDefault();
                 if (!gameActive || gameWon) return;
 
+                // 1. If the current box has a letter, clear it and STAY in the current box
                 if (e.target.value !== '') {
-                    // Box has a letter -> clear it, then step back one box
                     clearInputAndCopies(e.target);
-                    const prev = getPreviousInput(e.target);
-                    if (prev) prev.focus();
-                } else {
-                    // Box already empty -> step back and clear that box
+                } 
+                // 2. If the current box is already empty, move backward and clear that box
+                else {
                     const prev = getPreviousInput(e.target);
                     if (prev) {
                         clearInputAndCopies(prev);
@@ -412,6 +411,7 @@ function attachSyncAndWinDetection() {
         });
     });
 }
+
 function enableGame() {
     checkBtn.disabled = false;
     resetBtn.disabled = false;
