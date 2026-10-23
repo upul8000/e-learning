@@ -33,14 +33,17 @@ function getAllValidClues(phraseText) {
     const phraseLetters = getUniqueLetters(phraseText);
     const valid = [];
     for (let clue of cluePool) {
-        const wordLetters = clue.word.toUpperCase();
+        // Strip spaces and non-letters from the clue word
+        const cleanWord = clue.word.toUpperCase().replace(/[^A-Z]/g, ''); 
         let allPresent = true;
-        for (let ch of wordLetters) {
+        
+        for (let ch of cleanWord) {
             if (!phraseLetters.has(ch)) {
                 allPresent = false;
                 break;
             }
         }
+        
         if (allPresent) valid.push(clue);
     }
     return valid;
@@ -52,10 +55,9 @@ function selectCoveringClues(phraseText) {
     
     // 1. Get all clues that ONLY contain letters present in the phrase
     const validClues = getAllValidClues(phraseText);
-    
     if (validClues.length === 0) return [];
     
-    // 2. Shuffle the valid clues randomly (Fisher-Yates shuffle)
+    // 2. Shuffle the valid clues randomly
     const shuffledClues = [...validClues];
     for (let i = shuffledClues.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -65,18 +67,50 @@ function selectCoveringClues(phraseText) {
     const selected = [];
     const covered = new Set();
     
-    // 3. Loop through the shuffled clues and add them until all letters are covered
+    // 3. Loop through the shuffled clues
     for (let clue of shuffledClues) {
-        // If we have already covered all required letters, stop adding clues
         if (covered.size === requiredLetters.size) break;
         
+        // Clean the word (remove spaces/punctuation)
+        const cleanWord = clue.word.toUpperCase().replace(/[^A-Z]/g, '');
+        const clueLetters = new Set(cleanWord.split(''));
+        
+        // Count how many NEW letters this clue brings
+        let newLettersCount = 0;
+        for (let letter of clueLetters) {
+            if (requiredLetters.has(letter) && !covered.has(letter)) {
+                newLettersCount++;
+            }
+        }
+        
+        // Skip this clue if it brings no new letters (fixes the "SOFT" vs "SOFTWARE" issue)
+        if (newLettersCount === 0) continue;
+        
+        // Add the clue
         selected.push(clue);
         
-        // Mark the letters in this clue as covered
-        const clueLetters = new Set(clue.word.toUpperCase().replace(/[^A-Z]/g, '').split(''));
+        // Mark letters as covered
         for (let letter of clueLetters) {
-            if (requiredLetters.has(letter)) {
-                covered.add(letter);
+            if (requiredLetters.has(letter)) covered.add(letter);
+        }
+        
+        // --- NEW LOGIC: Remove redundant previously selected clues ---
+        // Example: If we added "SOFTWARE", remove the older "SOFT" because it's now a subset
+        for (let i = selected.length - 2; i >= 0; i--) {
+            const olderCleanWord = selected[i].word.toUpperCase().replace(/[^A-Z]/g, '');
+            let isSubset = true;
+            
+            // Check if all letters of the older clue are in the new clue
+            for (let ch of olderCleanWord) {
+                if (!clueLetters.has(ch)) {
+                    isSubset = false;
+                    break;
+                }
+            }
+            
+            // If it is a subset (like SOFT is to SOFTWARE), remove it
+            if (isSubset) {
+                selected.splice(i, 1);
             }
         }
     }
@@ -122,23 +156,24 @@ function renderGame() {
         const inputsDiv = document.createElement('div');
         inputsDiv.className = 'clue-inputs';
         
-        // --- NEW MULTI-WORD SUPPORT CODE ---
+        // Split multi-word clues by space to render them correctly
         const clueWords = clue.word.split(' ');
         clueWords.forEach(word => {
             const wordBlock = document.createElement('div');
             wordBlock.style.display = 'flex';
-            wordBlock.style.marginRight = '12px'; // Adds space between multiple words
+            wordBlock.style.marginRight = '10px'; // Space between words
             
             for (let letter of word) {
-                const tile = document.createElement('div');
-                tile.className = 'tile';
-                const num = currentLetterMap[letter];
-                tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
-                wordBlock.appendChild(tile);
+                if (/[A-Z]/.test(letter)) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    const num = currentLetterMap[letter];
+                    tile.innerHTML = `<input type="text" maxlength="1" data-num="${num}" data-char="${letter}"><span>${num}</span>`;
+                    wordBlock.appendChild(tile);
+                }
             }
             inputsDiv.appendChild(wordBlock);
         });
-        // -----------------------------------
         
         row.appendChild(textDiv);
         row.appendChild(inputsDiv);
