@@ -215,3 +215,8 @@ h1 {
 .subject-btn:hover { border-color: #3b82f6; background: #eff6ff; }
 .subject-btn.active { border-color: #2563eb; background: #dbeafe; font-weight: bold; }
 .subject-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input.wrong-letter {
+    color: red !important;
+    font-weight: bold;
+}

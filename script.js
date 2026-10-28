@@ -340,6 +340,7 @@ function clearInputAndCopies(input) {
     const num = input.getAttribute('data-num');
     document.querySelectorAll(`input[data-num="${num}"]`).forEach(inp => {
         inp.value = '';
+        inp.classList.remove('wrong-letter'); // <-- Add this line
     });
 }
 
@@ -370,11 +371,27 @@ function attachSyncAndWinDetection() {
             const oldValue = e.target.value;
             e.target.value = filtered;
             const num = e.target.getAttribute('data-num');
+            const expectedChar = e.target.getAttribute('data-char');
+
+            // Sync all boxes with the same number
             document.querySelectorAll(`input[data-num="${num}"]`).forEach(syncInp => {
                 if (syncInp !== e.target && syncInp.value !== filtered) {
                     syncInp.value = filtered;
                 }
+                
+                // --- NEW LOGIC: Check if the letter is correct ---
+                if (filtered !== "") {
+                    if (filtered === syncInp.getAttribute('data-char')) {
+                        syncInp.classList.remove('wrong-letter');
+                    } else {
+                        syncInp.classList.add('wrong-letter');
+                    }
+                } else {
+                    syncInp.classList.remove('wrong-letter');
+                }
+                // -------------------------------------------------
             });
+
             if (filtered !== "" && (oldValue === "" || filtered !== oldValue)) {
                 moveToNextEmpty(e.target);
             }
@@ -499,7 +516,7 @@ async function selectSubject(subject) {
 
         enableGame();
         closeSubjectModal();
-        loadPuzzle(0);                 // full re-render, resets counters, starts at phrase 0
+        loadPuzzle(Math.floor(Math.random() * phraseList.length));
     } catch (err) {
         console.error(err);
         showStatusMessage('Error loading subject: ' + err.message, true);
@@ -516,4 +533,11 @@ loadSubjects();
 
 checkBtn.addEventListener('click', verifySolution);
 resetBtn.addEventListener('click', resetCurrentPuzzle);
-nextBtn.addEventListener('click', () => loadPuzzle(currentPhraseIndex + 1));
+nextBtn.addEventListener('click', () => {
+    let randomIndex = Math.floor(Math.random() * phraseList.length);
+    // Optional: Prevent loading the exact same puzzle twice in a row
+    while (phraseList.length > 1 && randomIndex === currentPhraseIndex) {
+        randomIndex = Math.floor(Math.random() * phraseList.length);
+    }
+    loadPuzzle(randomIndex);
+});
