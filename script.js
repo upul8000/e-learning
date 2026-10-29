@@ -161,7 +161,7 @@ function renderGame() {
         clueWords.forEach(word => {
             const wordBlock = document.createElement('div');
             wordBlock.style.display = 'flex';
-            wordBlock.style.marginRight = '12px'; // Space between words
+            wordBlock.style.marginRight = '15px'; // Space between words
             
             for (let letter of word) {
                 if (/[A-Z]/.test(letter)) {
