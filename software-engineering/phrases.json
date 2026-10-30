@@ -1,0 +1,20 @@
+{
+  "phrases": [
+    { "text": "AGILE SOFTWARE DEVELOPMENT" },
+    { "text": "REQUIREMENTS ENGINEERING" },
+    { "text": "SOFTWARE ARCHITECTURE" },
+    { "text": "DESIGN PATTERNS" },
+    { "text": "VERSION CONTROL SYSTEM" },
+    { "text": "CONTINUOUS INTEGRATION" },
+    { "text": "TEST DRIVEN DEVELOPMENT" },
+    { "text": "OBJECT ORIENTED PROGRAMMING" },
+    { "text": "CODE REFACTORING" },
+    { "text": "QUALITY ASSURANCE" },
+    { "text": "SOFTWARE MAINTENANCE" },
+    { "text": "SOFTWARE DEVELOPMENT LIFE CYCLE" },
+    { "text": "CODE REVIEW" },
+    { "text": "USER STORY" },
+    { "text": "DEBUGGING" },
+    { "text": "PROJECT MANAGEMENT" }
+  ]
+}

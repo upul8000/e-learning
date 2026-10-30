@@ -13,10 +13,10 @@
       "clues": "c-language/clues.json"
     },
     {
-      "id": "java",
-      "name": "Java",
-      "phrases": "java/phrases.json",
-      "clues": "java/clues.json"
+      "id": "software-engineering",
+      "name": "Software Engineering",
+      "phrases": "software-engineering/phrases.json",
+      "clues": "software-engineering/clues.json"
     }
   ]
 }
