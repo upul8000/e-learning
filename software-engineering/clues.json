@@ -83,6 +83,16 @@
     { "word": "SOFTWARE ENGINEERING", "definition": "The disciplined application of engineering principles to the design, creation, testing, and maintenance of software." },
     { "word": "ORGANIZATIONAL INFORMATION SYSTEM", "definition": "Large-scale software built to support business operations, data tracking, and decision-making within a company or enterprise (e.g., payroll, inventory, or customer relationship management systems)." },
     { "word": "SCIENTIFIC INSTRUMENT CONTROLLER", "definition": "Specialized software designed to precisely monitor, command, and regulate physical laboratory or scientific hardware (such as a telescope or spectrometer)." },
-    { "word": "GRAPHICS INTENSIVE COMPUTER GAME", "definition": "Video games that require advanced processing power and real-time computation to render complex 3D visual environments, physics simulations, and animations smoothly." }
+    { "word": "GRAPHICS INTENSIVE COMPUTER GAME", "definition": "Video games that require advanced processing power and real-time computation to render complex 3D visual environments, physics simulations, and animations smoothly." },
+        { "word": "SOFTWARE FAILURE", "definition": "Occurs when a software system fails to deliver its required functionality, dramatically exceeds its budget, misses its delivery deadline, or crashes in production." },
+    { "word": "INADEQUATE", "definition": "Lacking the quality, capability, or effectiveness needed to meet a specific requirement or standard." },
+    { "word": "MODERN SOFTWARE DEVELOPMENT", "definition": "The current practices, frameworks, and technologies used to create software in fast-paced environments, often involving cloud computing, continuous integration, and rapid iteration." },
+    { "word": "INCREASING DEMANDS", "definition": "The constantly growing expectations from users and businesses for larger systems, faster delivery times, tighter integration, and more complex capabilities." },
+    { "word": "CAPABILITIES", "definition": "The specific functions, features, or tasks that a software system is capable of performing." },
+    { "word": "LOW EXPECTATIONS", "definition": "A lack of rigorous quality standards or professional engineering discipline, often leading companies to accept substandard or amateur development practices." },
+    { "word": "SOFTWARE ENGINEERING METHODS", "definition": "Established, systematic frameworks and workflows (such as Agile, DevOps, or test-driven development) used to plan, manage, and execute software development." },
+    { "word": "RELIABLE", "definition": "The ability of a software system to perform its intended functions consistently without errors, crashes, or unexpected behavior under specified conditions." },
+    { "word": "SOFTWARE ENGINEERING EDUCATION", "definition": "Formal training and academic programs designed to teach foundational computer science principles, system design, and software engineering best practices." },
+    { "word": "TELECOMMUNICATIONS", "definition": "The electronic transmission of information—including voice, data, images, and video—over long distances using technology such as satellites, fiber optics, and wireless networks." }
   ]
 }
